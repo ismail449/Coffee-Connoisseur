@@ -1,14 +1,24 @@
 import Head from "next/head";
-import { Inter } from "next/font/google";
 import styles from "@/styles/Home.module.css";
 import Banner from "@/components/banner";
 import Image from "next/image";
 import Card from "@/components/card";
-import coffeeStores from "../data/coffee-stores.json";
+import coffeeStoresData from "../data/coffee-stores.json";
+import { GetStaticProps, InferGetStaticPropsType } from "next";
 
-const inter = Inter({ subsets: ["latin"] });
+export const getStaticProps: GetStaticProps<{
+  coffeeStores: typeof coffeeStoresData;
+}> = async (context) => {
+  return {
+    props: {
+      coffeeStores: coffeeStoresData,
+    },
+  };
+};
 
-export default function Home() {
+export default function Home({
+  coffeeStores,
+}: InferGetStaticPropsType<typeof getStaticProps>) {
   const handleBannerBtnOnClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -20,7 +30,7 @@ export default function Home() {
         <title>Coffee Connoisseur</title>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className={`${styles.main} ${inter.className}`}>
+      <main className={styles.main}>
         <Banner
           buttonText="View stores nearby"
           handleOnClick={handleBannerBtnOnClick}
@@ -32,17 +42,22 @@ export default function Home() {
           height={400}
           className={styles.heroImage}
         />
-        <div className={styles.cardLayout}>
-          {coffeeStores.map(({ imgUrl, id, name }) => (
-            <Card
-              key={id}
-              name={name}
-              imgUrl={imgUrl}
-              href={`/coffee-store/${id}`}
-              className={styles.card}
-            />
-          ))}
-        </div>
+        {coffeeStores.length > 0 ? (
+          <>
+            <h2 className={styles.heading2}>Toronto Stores</h2>
+            <div className={styles.cardLayout}>
+              {coffeeStores.map(({ imgUrl, id, name }) => (
+                <Card
+                  key={id}
+                  name={name}
+                  imgUrl={imgUrl}
+                  href={`/coffee-store/${id}`}
+                  className={styles.card}
+                />
+              ))}
+            </div>
+          </>
+        ) : null}
       </main>
     </div>
   );
