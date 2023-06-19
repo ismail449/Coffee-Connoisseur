@@ -2,28 +2,31 @@ import React from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
-import coffeeStoresData from "../../data/coffee-stores.json";
 import Head from "next/head";
 import styles from "@/styles/coffee-store.module.css";
 import Image from "next/image";
 import cls from "classnames";
+import { fetchCoffeeStores, CoffeeStore } from "@/lib/coffee-stores";
 
 export const getStaticProps: GetStaticProps<{
-  coffeeStore: (typeof coffeeStoresData)[0];
-}> = ({ params }) => {
+  coffeeStore: CoffeeStore;
+}> = async ({ params }) => {
+  const coffeeStores: CoffeeStore[] = await fetchCoffeeStores();
+
   return {
     props: {
-      coffeeStore: coffeeStoresData.find(
-        (coffeeStore) => coffeeStore.id.toString() === params?.id
+      coffeeStore: coffeeStores.find(
+        (coffeeStoreData) => coffeeStoreData.fsq_id === params?.id
       )!,
     },
   };
 };
 
-export const getStaticPaths: GetStaticPaths = () => {
-  const paths = coffeeStoresData.map((coffeeStore) => {
+export const getStaticPaths: GetStaticPaths = async () => {
+  const coffeeStores: CoffeeStore[] = await fetchCoffeeStores();
+  const paths = coffeeStores.map((coffeeStore) => {
     return {
-      params: { id: coffeeStore.id.toString() },
+      params: { id: coffeeStore.fsq_id },
     };
   });
   return {
@@ -54,15 +57,13 @@ const CoffeeStore = ({
           <div className={styles.nameWrapper}>
             <h1 className={styles.name}>{coffeeStore?.name}</h1>
           </div>
-          <div className={styles.storeImgWrapper}>
-            <Image
-              src={coffeeStore?.imgUrl ?? ""}
-              alt={coffeeStore.name}
-              width={600}
-              height={360}
-              className={styles.storeImage}
-            />
-          </div>
+          <Image
+            src={coffeeStore?.imgUrl}
+            alt={coffeeStore.name}
+            width={600}
+            height={360}
+            className={styles.storeImage}
+          />
         </div>
         <div className={cls("glass", styles.col2)}>
           <div className={styles.iconWrapper}>
@@ -72,7 +73,9 @@ const CoffeeStore = ({
               width={24}
               height={24}
             />
-            <p className={styles.text}>{coffeeStore?.address}</p>
+            <p className={styles.text}>
+              {coffeeStore?.location.formatted_address}
+            </p>
           </div>
           <div className={styles.iconWrapper}>
             <Image
@@ -81,7 +84,7 @@ const CoffeeStore = ({
               width={24}
               height={24}
             />
-            <p className={styles.text}>{coffeeStore?.neighbourhood}</p>
+            <p className={styles.text}>{coffeeStore?.location.locality}</p>
           </div>
           <div className={styles.iconWrapper}>
             <Image
