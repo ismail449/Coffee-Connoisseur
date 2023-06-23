@@ -47,12 +47,12 @@ export default function Home({
           <>
             <h2 className={styles.heading2}>Cairo Stores</h2>
             <div className={styles.cardLayout}>
-              {coffeeStores.map(({ fsq_id, name, imgUrl }) => (
+              {coffeeStores.map(({ id, name, imgUrl }) => (
                 <Card
-                  key={fsq_id}
+                  key={id}
                   name={name}
                   imgUrl={imgUrl}
-                  href={`/coffee-store/${fsq_id}`}
+                  href={`/coffee-store/${id}`}
                   className={styles.card}
                 />
               ))}

@@ -1,9 +1,16 @@
 import { createApi } from "unsplash-js";
-export interface CoffeeStore {
+interface FetchedCoffeeStore {
   fsq_id: string;
-  imgUrl: string;
   location: Location;
   name: string;
+}
+
+export interface CoffeeStore {
+  id: string;
+  imgUrl: string;
+  name: string;
+  address: string;
+  neighborhood: string;
 }
 
 interface Location {
@@ -22,7 +29,7 @@ const getCoffeeStoresPhotos = async () => {
     perPage: 30,
   });
   const unsplashResults = photos.response?.results.map(
-    (result) => result.urls["small"]
+    (result) => result.urls["regular"]
   );
   return unsplashResults;
 };
@@ -58,10 +65,16 @@ export const fetchCoffeeStores = async () => {
     options
   );
   const coffeeData = await response.json();
-  return coffeeData.results.map((result: {}, index: number) => {
+  return coffeeData.results.map((result: FetchedCoffeeStore, index: number) => {
     return {
-      ...result,
-      imgUrl: unsplashResults[index],
+      id: result.fsq_id,
+      imgUrl:
+        unsplashResults.length > 0
+          ? unsplashResults[index]
+          : "/static/coffee-store-fallback.jpg",
+      address: result.location.formatted_address,
+      neighborhood: result.location.locality,
+      name: result.name,
     };
   }) as CoffeeStore[];
 };
