@@ -2,7 +2,10 @@ import { useState } from "react";
 
 const useTrackLocation = () => {
   const [locationErrorMessage, setLocationErrorMessage] = useState("");
-  const [latLong, setLatLong] = useState({ lat: 0, long: 0 });
+  const [latLong, setLatLong] = useState({
+    lat: 30.059522635023235,
+    long: 31.220919917913005,
+  });
   const [isFindingLocation, setIsFindingLocation] = useState(false);
   const success = (position: GeolocationPosition) => {
     const latitude = position.coords.latitude;
