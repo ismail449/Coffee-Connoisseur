@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Link from "next/link";
 import { GetStaticPaths, GetStaticProps, InferGetStaticPropsType } from "next";
@@ -7,17 +7,21 @@ import styles from "@/styles/coffee-store.module.css";
 import Image from "next/image";
 import cls from "classnames";
 import { fetchCoffeeStores, CoffeeStore } from "@/lib/coffee-stores";
+import { useStoreContext } from "../../context/store-context";
+import { isEmpty } from "@/utils";
 
 export const getStaticProps: GetStaticProps<{
   coffeeStore: CoffeeStore;
 }> = async ({ params }) => {
   const coffeeStores: CoffeeStore[] = await fetchCoffeeStores();
-
+  const foundCoffeeStoreById = coffeeStores.find(
+    (coffeeStoreData) => coffeeStoreData.id === params?.id
+  );
   return {
     props: {
-      coffeeStore: coffeeStores.find(
-        (coffeeStoreData) => coffeeStoreData.id === params?.id
-      )!,
+      coffeeStore: foundCoffeeStoreById
+        ? foundCoffeeStoreById
+        : ({} as CoffeeStore),
     },
   };
 };
@@ -39,12 +43,25 @@ const CoffeeStore = ({
   coffeeStore,
 }: InferGetStaticPropsType<typeof getStaticProps>) => {
   const router = useRouter();
+  const { coffeeStoresNearby } = useStoreContext();
+  const [renderedCoffeeStore, setRenderedCoffeeStore] =
+    useState<CoffeeStore>(coffeeStore);
 
+  const id = router.query.id;
+  useEffect(() => {
+    const isCoffeeStoreEmpty = isEmpty(coffeeStore);
+    if (isCoffeeStoreEmpty && coffeeStoresNearby.length > 0) {
+      const foundCoffeeStoreById = coffeeStoresNearby.find(
+        (coffeeStoreData) => coffeeStoreData.id === id
+      );
+      if (foundCoffeeStoreById) setRenderedCoffeeStore(foundCoffeeStoreById);
+    }
+  }, [coffeeStore, coffeeStoresNearby, id]);
   const handleUpVoteButton = () => {};
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
-  const { address, name, neighborhood, imgUrl } = coffeeStore;
+  const { address, name, neighborhood, imgUrl } = renderedCoffeeStore;
   return (
     <div className={styles.layout}>
       <Head>
@@ -59,7 +76,10 @@ const CoffeeStore = ({
             <h1 className={styles.name}>{name}</h1>
           </div>
           <Image
-            src={imgUrl}
+            src={
+              imgUrl ||
+              "https://images.unsplash.com/photo-1498804103079-a6351b050096?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&ixlib=rb-1.2.1&auto=format&fit=crop&w=2468&q=80"
+            }
             alt={name}
             width={600}
             height={360}

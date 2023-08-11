@@ -67,6 +67,7 @@
 .iconWrapper {
   display: flex;
   margin-bottom: 1rem /* 16px */;
+  align-items: center;
 }
 
 .text {

@@ -6,7 +6,8 @@ import Card from "@/components/card";
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { CoffeeStore, fetchCoffeeStores } from "@/lib/coffee-stores";
 import useTrackLocation from "@/hooks/use-track-location";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import { ACTION_TYPES, useStoreContext } from "../context/store-context";
 
 export const getStaticProps: GetStaticProps<{
   coffeeStores: CoffeeStore[];
@@ -22,30 +23,32 @@ export const getStaticProps: GetStaticProps<{
 export default function Home({
   coffeeStores,
 }: InferGetStaticPropsType<typeof getStaticProps>) {
-  const {
-    handleTrackLocation,
-    latLong,
-    locationErrorMessage,
-    isFindingLocation,
-  } = useTrackLocation();
+  const { latLong, dispatch, coffeeStoresNearby } = useStoreContext();
+  const [coffeeStoresError, setCoffeeStoresError] = useState<string>("");
+  const { handleTrackLocation, locationErrorMessage, isFindingLocation } =
+    useTrackLocation();
 
   useEffect(() => {
-    const fetchCoffeeStoresWithLocation = async () => {
-      if (latLong) {
+    const fetchCoffeeStoresNearby = async () => {
+      if (latLong.lat && latLong.long) {
         try {
           const fetchedCoffeeStores = await fetchCoffeeStores(
             latLong.lat,
             latLong.long,
             30
           );
-          console.log({ fetchedCoffeeStores });
+          dispatch({
+            payload: fetchedCoffeeStores,
+            type: ACTION_TYPES.SET_COFFEE_STORES,
+          });
         } catch (error) {
           console.log(error);
+          if (error instanceof Error) setCoffeeStoresError(error.message);
         }
       }
     };
-    fetchCoffeeStoresWithLocation();
-  }, [latLong]);
+    fetchCoffeeStoresNearby();
+  }, [latLong, dispatch]);
 
   const handleBannerBtnOnClick = (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
@@ -66,6 +69,9 @@ export default function Home({
         {locationErrorMessage.length > 0 ? (
           <p>something went wrong: {locationErrorMessage}</p>
         ) : null}
+        {coffeeStoresError.length > 0 ? (
+          <p>something went wrong: {coffeeStoresError}</p>
+        ) : null}
         <Image
           alt="lady drinking coffee"
           src="/static/hero-image.png"
@@ -73,6 +79,22 @@ export default function Home({
           height={400}
           className={styles.heroImage}
         />
+        {coffeeStoresNearby.length > 0 ? (
+          <div className={styles.sectionWrapper}>
+            <h2 className={styles.heading2}>Near Me</h2>
+            <div className={styles.cardLayout}>
+              {coffeeStoresNearby.map(({ id, name, imgUrl }) => (
+                <Card
+                  key={id}
+                  name={name}
+                  imgUrl={imgUrl}
+                  href={`/coffee-store/${id}`}
+                  className={styles.card}
+                />
+              ))}
+            </div>
+          </div>
+        ) : null}
         {coffeeStores.length > 0 ? (
           <div className={styles.sectionWrapper}>
             <h2 className={styles.heading2}>Cairo Stores</h2>
