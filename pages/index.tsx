@@ -31,16 +31,25 @@ export default function Home({
   useEffect(() => {
     const fetchCoffeeStoresNearby = async () => {
       if (latLong.lat && latLong.long) {
+        const data = {
+          latLong: latLong,
+          limit: 30,
+        };
         try {
-          const fetchedCoffeeStores = await fetchCoffeeStores(
-            latLong.lat,
-            latLong.long,
-            30
-          );
+          const response = await fetch("/api/getCoffeeStoresByLocation", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(data),
+          });
+          const fetchedCoffeeStores = await response.json();
+          console.log({ fetchedCoffeeStores });
           dispatch({
             payload: fetchedCoffeeStores,
             type: ACTION_TYPES.SET_COFFEE_STORES,
           });
+          setCoffeeStoresError("");
         } catch (error) {
           console.log(error);
           if (error instanceof Error) setCoffeeStoresError(error.message);
