@@ -44,8 +44,8 @@ const getUrlForCoffeeStores = (
 };
 
 export const fetchCoffeeStores = async (
-  lat = 30.059522635023235,
-  long = 31.220919917913005,
+  lat = 30.033333,
+  long = 31.233334,
   limit = 6
 ) => {
   const unsplashResults = await getCoffeeStoresPhotos();
