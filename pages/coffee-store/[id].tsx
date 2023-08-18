@@ -48,13 +48,42 @@ const CoffeeStore = ({
     useState<CoffeeStore>(coffeeStore);
 
   const id = router.query.id;
+
+  const handleCreateCoffeeStore = async (coffeeStore: CoffeeStore) => {
+    try {
+      const { address, id, imgUrl, name, neighborhood, voting } = coffeeStore;
+      const response = await fetch("/api/createCoffeeStore", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+          imgUrl,
+          name,
+          voting: 0,
+          neighborhood: neighborhood || "",
+          address: address || "",
+        }),
+      });
+      const fetchedCoffeeStore = (await response.json()) as CoffeeStore;
+      console.log({ fetchedCoffeeStore });
+    } catch (error) {
+      console.error("Error creating a coffee store ", error);
+    }
+  };
   useEffect(() => {
     const isCoffeeStoreEmpty = isEmpty(coffeeStore);
     if (isCoffeeStoreEmpty && coffeeStoresNearby.length > 0) {
       const foundCoffeeStoreById = coffeeStoresNearby.find(
         (coffeeStoreData) => coffeeStoreData.id === id
       );
-      if (foundCoffeeStoreById) setRenderedCoffeeStore(foundCoffeeStoreById);
+      if (foundCoffeeStoreById) {
+        setRenderedCoffeeStore(foundCoffeeStoreById);
+        handleCreateCoffeeStore(foundCoffeeStoreById);
+      }
+    } else {
+      handleCreateCoffeeStore(coffeeStore);
     }
   }, [coffeeStore, coffeeStoresNearby, id]);
   const handleUpVoteButton = () => {};

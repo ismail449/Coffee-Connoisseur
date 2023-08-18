@@ -11,6 +11,7 @@ export interface CoffeeStore {
   name: string;
   address: string;
   neighborhood: string;
+  voting: number;
 }
 
 interface Location {
