@@ -46,6 +46,7 @@ const CoffeeStore = ({
   const { coffeeStoresNearby } = useStoreContext();
   const [renderedCoffeeStore, setRenderedCoffeeStore] =
     useState<CoffeeStore>(coffeeStore);
+  const [votingCount, setVotingCount] = useState(0);
 
   const id = router.query.id;
 
@@ -86,7 +87,9 @@ const CoffeeStore = ({
       handleCreateCoffeeStore(coffeeStore);
     }
   }, [coffeeStore, coffeeStoresNearby, id]);
-  const handleUpVoteButton = () => {};
+  const handleUpVoteButton = () => {
+    setVotingCount((votingCount) => votingCount + 1);
+  };
   if (router.isFallback) {
     return <div>Loading...</div>;
   }
@@ -146,7 +149,7 @@ const CoffeeStore = ({
               width={24}
               height={24}
             />
-            <p className={styles.text}>{1}</p>
+            <p className={styles.text}>{votingCount}</p>
           </div>
           <button className={styles.upVoteButton} onClick={handleUpVoteButton}>
             Up Vote
