@@ -13,3 +13,12 @@ export const getFieldsArray = (records: Records<FieldSet>) => {
     };
   });
 };
+
+export const findCoffeeStoreById = async (id: string | string[]) => {
+  const records = await table
+    .select({
+      filterByFormula: `id="${id}"`,
+    })
+    .firstPage();
+  return getFieldsArray(records);
+};

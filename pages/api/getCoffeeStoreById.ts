@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { FieldSet } from "airtable";
-import { getFieldsArray, table } from "@/lib/airtable";
+import { getFieldsArray, table, findCoffeeStoreById } from "@/lib/airtable";
 
 type ErrorType = {
   message: string;
@@ -17,13 +17,8 @@ const getCoffeeStoreById = async (
     return;
   }
   try {
-    const records = await table
-      .select({
-        filterByFormula: `id="${id}"`,
-      })
-      .firstPage();
-    if (records.length > 0) {
-      const coffeeStores = getFieldsArray(records);
+    const coffeeStores = await findCoffeeStoreById(id);
+    if (coffeeStores.length > 0) {
       res.send(coffeeStores);
     } else {
       res.status(404).send({ message: "id Not Found!" });

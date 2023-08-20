@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { FieldSet } from "airtable";
-import { table, getFieldsArray } from "@/lib/airtable";
+import { table, getFieldsArray, findCoffeeStoreById } from "@/lib/airtable";
 
 type ErrorType = {
   message: string;
@@ -17,14 +17,9 @@ const createCoffeeStore = async (
       res.status(400).send({ message: "id is messing" });
       return;
     }
-    const records = await table
-      .select({
-        filterByFormula: `id="${id}"`,
-      })
-      .firstPage();
+    const coffeeStores = await findCoffeeStoreById(id);
     try {
-      if (records.length > 0) {
-        const coffeeStores = getFieldsArray(records);
+      if (coffeeStores.length > 0) {
         res.send(coffeeStores);
       } else {
         if (id && name) {
