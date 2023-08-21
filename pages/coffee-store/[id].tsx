@@ -9,6 +9,9 @@ import cls from "classnames";
 import { fetchCoffeeStores, CoffeeStore } from "@/lib/coffee-stores";
 import { useStoreContext } from "../../context/store-context";
 import { isEmpty } from "@/utils";
+import useSWR from "swr";
+
+export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export const getStaticProps: GetStaticProps<{
   coffeeStore: CoffeeStore;
@@ -47,8 +50,11 @@ const CoffeeStore = ({
   const [renderedCoffeeStore, setRenderedCoffeeStore] =
     useState<CoffeeStore>(coffeeStore);
   const [votingCount, setVotingCount] = useState(0);
-
   const id = router.query.id;
+  const { data, error } = useSWR<CoffeeStore[]>(
+    `/api/getCoffeeStoreById?id=${id}`,
+    fetcher
+  );
 
   const handleCreateCoffeeStore = async (coffeeStore: CoffeeStore) => {
     try {
@@ -73,6 +79,15 @@ const CoffeeStore = ({
       console.error("Error creating a coffee store ", error);
     }
   };
+
+  useEffect(() => {
+    if (data && data.length) {
+      console.log(data.length);
+      console.log("data from SWR", data);
+      setRenderedCoffeeStore(data[0]);
+      setVotingCount(data[0].voting);
+    }
+  }, [data]);
   useEffect(() => {
     const isCoffeeStoreEmpty = isEmpty(coffeeStore);
     if (isCoffeeStoreEmpty && coffeeStoresNearby.length > 0) {
@@ -92,6 +107,9 @@ const CoffeeStore = ({
   };
   if (router.isFallback) {
     return <div>Loading...</div>;
+  }
+  if (error) {
+    return <div>Something went wrong retrieving coffee store page</div>;
   }
   const { address, name, neighborhood, imgUrl } = renderedCoffeeStore;
   return (

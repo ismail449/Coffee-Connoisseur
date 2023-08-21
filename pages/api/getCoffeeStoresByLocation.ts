@@ -23,7 +23,6 @@ const getCoffeeStoresByLocation = async (
         latLong.long,
         limit
       );
-      console.log(response);
       res.json(response);
     }
   } catch (error) {

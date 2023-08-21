@@ -24,7 +24,6 @@ const getCoffeeStoreById = async (
       res.status(404).send({ message: "id Not Found!" });
     }
   } catch (error) {
-    console.log();
     if (error instanceof Error)
       res.status(500).send({ message: "something went wrong", error });
   }
