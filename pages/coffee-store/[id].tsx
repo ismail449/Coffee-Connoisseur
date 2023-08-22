@@ -8,10 +8,8 @@ import Image from "next/image";
 import cls from "classnames";
 import { fetchCoffeeStores, CoffeeStore } from "@/lib/coffee-stores";
 import { useStoreContext } from "../../context/store-context";
-import { isEmpty } from "@/utils";
+import { fetcher, isEmpty } from "@/utils";
 import useSWR from "swr";
-
-export const fetcher = (url: string) => fetch(url).then((res) => res.json());
 
 export const getStaticProps: GetStaticProps<{
   coffeeStore: CoffeeStore;
@@ -51,14 +49,18 @@ const CoffeeStore = ({
     useState<CoffeeStore>(coffeeStore);
   const [votingCount, setVotingCount] = useState(0);
   const id = router.query.id;
-  const { data, error } = useSWR<CoffeeStore[]>(
+  const { data, error, isLoading } = useSWR<CoffeeStore[]>(
     `/api/getCoffeeStoreById?id=${id}`,
     fetcher
   );
 
   const handleCreateCoffeeStore = async (coffeeStore: CoffeeStore) => {
     try {
-      const { address, id, imgUrl, name, neighborhood, voting } = coffeeStore;
+      const { address, id, imgUrl, name, neighborhood } = coffeeStore;
+
+      if (!id) {
+        return;
+      }
       const response = await fetch("/api/createCoffeeStore", {
         method: "POST",
         headers: {
@@ -82,12 +84,11 @@ const CoffeeStore = ({
 
   useEffect(() => {
     if (data && data.length) {
-      console.log(data.length);
-      console.log("data from SWR", data);
       setRenderedCoffeeStore(data[0]);
       setVotingCount(data[0].voting);
     }
   }, [data]);
+
   useEffect(() => {
     const isCoffeeStoreEmpty = isEmpty(coffeeStore);
     if (isCoffeeStoreEmpty && coffeeStoresNearby.length > 0) {
@@ -102,13 +103,14 @@ const CoffeeStore = ({
       handleCreateCoffeeStore(coffeeStore);
     }
   }, [coffeeStore, coffeeStoresNearby, id]);
+
   const handleUpVoteButton = () => {
     setVotingCount((votingCount) => votingCount + 1);
   };
-  if (router.isFallback) {
+  if (router.isFallback || isLoading) {
     return <div>Loading...</div>;
   }
-  if (error) {
+  if (error || !renderedCoffeeStore) {
     return <div>Something went wrong retrieving coffee store page</div>;
   }
   const { address, name, neighborhood, imgUrl } = renderedCoffeeStore;
