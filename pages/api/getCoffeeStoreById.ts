@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { FieldSet } from "airtable";
-import { getFieldsArray, table, findCoffeeStoreById } from "@/lib/airtable";
+import { findCoffeeStoreById } from "@/lib/airtable";
 
 type ErrorType = {
   message: string;

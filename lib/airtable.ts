@@ -6,9 +6,10 @@ const base = new Airtable({
 
 export const table = base("coffee-stores");
 
-export const getFieldsArray = (records: Records<FieldSet>) => {
-  return records.map(({ fields }) => {
+export const getFieldsArray = (records: Records<FieldSet>): FieldSet[] => {
+  return records.map(({ fields, id }) => {
     return {
+      recordId: id,
       ...fields,
     };
   });
@@ -21,4 +22,19 @@ export const findCoffeeStoreById = async (id: string | string[]) => {
     })
     .firstPage();
   return getFieldsArray(records);
+};
+
+export const updateCoffeeStoreById = async (
+  id: string,
+  upvoteCount: number
+) => {
+  const records = await table.update([
+    {
+      id: id,
+      fields: {
+        voting: upvoteCount,
+      },
+    },
+  ]);
+  return getFieldsArray(records)[0];
 };

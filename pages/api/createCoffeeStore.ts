@@ -4,7 +4,7 @@ import { table, getFieldsArray, findCoffeeStoreById } from "@/lib/airtable";
 
 type ErrorType = {
   message: string;
-  error?: Error;
+  error?: any;
 };
 
 const createCoffeeStore = async (
@@ -43,10 +43,10 @@ const createCoffeeStore = async (
       }
     } catch (error) {
       console.log("Error finding or creating store ", error);
-      if (error instanceof Error)
-        res
-          .status(500)
-          .json({ message: "Error finding or creating store", error: error });
+
+      res
+        .status(500)
+        .json({ message: "Error finding or creating store", error: error });
     }
   }
 };
