@@ -104,8 +104,28 @@ const CoffeeStore = ({
     }
   }, [coffeeStore, coffeeStoresNearby, id]);
 
-  const handleUpVoteButton = () => {
-    setVotingCount((votingCount) => votingCount + 1);
+  const handleUpVoteButton = async () => {
+    try {
+      if (!id) {
+        return;
+      }
+      const response = await fetch("/api/upvoteCoffeeStoreById", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          id,
+        }),
+      });
+      const fetchedCoffeeStore = (await response.json()) as CoffeeStore;
+      console.log({ fetchedCoffeeStore });
+      if (fetchedCoffeeStore) {
+        setVotingCount(fetchedCoffeeStore.voting);
+      }
+    } catch (error) {
+      console.error("Error up voting coffee store ", error);
+    }
   };
   if (router.isFallback || isLoading) {
     return <div>Loading...</div>;
