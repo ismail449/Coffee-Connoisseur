@@ -44,14 +44,13 @@ export default function Home({
             body: JSON.stringify(data),
           });
           const fetchedCoffeeStores = await response.json();
-          console.log({ fetchedCoffeeStores });
+          
           dispatch({
             payload: fetchedCoffeeStores,
             type: ACTION_TYPES.SET_COFFEE_STORES,
           });
           setCoffeeStoresError("");
         } catch (error) {
-          console.log(error);
           if (error instanceof Error) setCoffeeStoresError(error.message);
         }
       }

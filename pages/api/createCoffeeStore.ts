@@ -42,8 +42,6 @@ const createCoffeeStore = async (
         }
       }
     } catch (error) {
-      console.log("Error finding or creating store ", error);
-
       res
         .status(500)
         .json({ message: "Error finding or creating store", error: error });

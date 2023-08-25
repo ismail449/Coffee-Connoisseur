@@ -76,7 +76,6 @@ const CoffeeStore = ({
         }),
       });
       const fetchedCoffeeStore = (await response.json()) as CoffeeStore;
-      console.log({ fetchedCoffeeStore });
     } catch (error) {
       console.error("Error creating a coffee store ", error);
     }
@@ -119,7 +118,7 @@ const CoffeeStore = ({
         }),
       });
       const fetchedCoffeeStore = (await response.json()) as CoffeeStore;
-      console.log({ fetchedCoffeeStore });
+
       if (fetchedCoffeeStore) {
         setVotingCount(fetchedCoffeeStore.voting);
       }

@@ -16,7 +16,6 @@ const getCoffeeStoresByLocation = async (
   }
   try {
     const { latLong, limit } = req.body;
-    console.log(latLong, limit);
     if (latLong && limit) {
       const response = await fetchCoffeeStores(
         latLong.lat,
