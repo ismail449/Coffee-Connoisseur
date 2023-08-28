@@ -21,7 +21,7 @@ const Card: FC<CardProps> = ({ name, imgUrl, href, className }) => {
           <Image
             className={styles.cardImage}
             src={imgUrl}
-            alt="coffee store"
+            alt={name}
             width={260}
             height={160}
           />

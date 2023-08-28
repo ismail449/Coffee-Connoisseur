@@ -44,7 +44,7 @@ export default function Home({
             body: JSON.stringify(data),
           });
           const fetchedCoffeeStores = await response.json();
-          
+
           dispatch({
             payload: fetchedCoffeeStores,
             type: ACTION_TYPES.SET_COFFEE_STORES,
@@ -68,6 +68,10 @@ export default function Home({
       <Head>
         <title>Coffee Connoisseur</title>
         <link rel="icon" href="/favicon.ico" />
+        <meta
+          name="description"
+          content="Allows you to discover coffee stores"
+        />
       </Head>
       <main className={styles.main}>
         <Banner
